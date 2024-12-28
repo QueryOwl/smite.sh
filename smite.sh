@@ -76,7 +76,7 @@ try again or use --help for more information" >&2
         --all-users) 
             # confirms the user is root before proceeding
             if [ ! "$USER" == "root" ]; then
-                echo "--user= must be ran with privledges
+                echo "--all-users must be ran with privledges
 try again or use --help for more information" >&2
                 exit 1
             else
@@ -108,7 +108,7 @@ exit 1
 fi
 
 # finds and confirms provided user and/or processes exist prior to deletion
-list=$(if [ "$allUsers" == true ]; then ps -au; else ps -u "$processUser" 2>/dev/null; fi | grep -w "$processName" 2>/dev/null | awk '{print $1}' 2>/dev/null) || list=""
+list=$(if [ "$allUsers" == true ]; then ps -ax; else ps -u "$processUser" 2>/dev/null; fi | grep -w "$processName" 2>/dev/null | awk '{print $1}' 2>/dev/null) || list=""
 if [ -z "$list" ]; then
     if [ "$allUsers" == true ]; then
         echo "process does not exist
@@ -133,4 +133,4 @@ do
         echo "killed $processName at $pid"
     fi
 done
-
+exit 0
