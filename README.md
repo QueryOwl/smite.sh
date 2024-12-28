@@ -1,7 +1,7 @@
 # smite.sh
 smite.sh is a simple program that handles both finding and termination of running processes.
 
-# General guide:
+### General guide:
 
 Usage:
     ./smite.sh [options]
