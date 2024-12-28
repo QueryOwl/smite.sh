@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 processUser=$USER
+grepArgs="-w"
 
 help="
 Usage:
@@ -63,6 +64,10 @@ while [ $# -gt 0 ]; do
             verbose=true
             force=true
         ;;
+        --grep-args=\[*\])
+            grepArgs=${1#"--grep-args=["}
+            grepArgs=${grepArgs%"]"}
+        ;;
         --user=*)
             # confirms the user is root before proceeding
             if [ ! "$USER" == "root" ]; then
@@ -76,7 +81,7 @@ try again or use --help for more information" >&2
         --all-users) 
             # confirms the user is root before proceeding
             if [ ! "$USER" == "root" ]; then
-                echo "--user= must be ran with privledges
+                echo "--all-users must be ran with privledges
 try again or use --help for more information" >&2
                 exit 1
             else
@@ -87,6 +92,7 @@ try again or use --help for more information" >&2
             # incorrect argument
             echo "invalid argument
 try again or use --help for more information" >&2
+            echo "$1" # debug
             exit 1
         ;;
         *)
@@ -108,13 +114,13 @@ exit 1
 fi
 
 # finds and confirms provided user and/or processes exist prior to deletion
-list=$(if [ "$allUsers" == true ]; then ps -au; else ps -u "$processUser" 2>/dev/null; fi | grep -w "$processName" 2>/dev/null | awk '{print $1}' 2>/dev/null) || list=""
+list=$(if [ "$allUsers" == true ]; then ps -ax; else ps -u "$processUser" 2>/dev/null; fi | grep "$grepArgs" "$processName" 2>/dev/null | awk '{print $1}' 2>/dev/null) || list=""
 if [ -z "$list" ]; then
-    if [ "$allUsers" == true ]; then
+    if [ "$allUsers" == true ] || [ "$processUser" == "$USER" ]; then
         echo "process does not exist
 try again or use --help for more information" >&2
     else
-        echo "user name or process does not exist
+        echo "user or process does not exist
 try again or use --help for more information" >&2
     fi
     exit 1
@@ -133,4 +139,4 @@ do
         echo "killed $processName at $pid"
     fi
 done
-
+exit 0
